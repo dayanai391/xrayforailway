@@ -1,7 +1,7 @@
-# Xray-core (VLESS + WebSocket) for Railway
+# DayanVPN — Xray (VLESS + WebSocket) behind nginx, with a landing page
 FROM alpine:3.20
 
-RUN apk add --no-cache curl unzip ca-certificates
+RUN apk add --no-cache nginx curl unzip ca-certificates bash
 
 # Install latest Xray-core
 RUN mkdir -p /usr/local/bin/xray /usr/local/share/xray \
@@ -10,17 +10,19 @@ RUN mkdir -p /usr/local/bin/xray /usr/local/share/xray \
     && chmod +x /usr/local/bin/xray/xray \
     && rm /tmp/Xray-linux-64.zip
 
-# GeoIP/GeoDomain data (used by routing rules)
+# GeoIP data for routing rules
 RUN curl -fsSL -o /usr/local/share/xray/geoip.dat "https://github.com/XTLS/Xray-core/releases/latest/download/geoip.dat" \
     && curl -fsSL -o /usr/local/share/xray/geosite.dat "https://github.com/XTLS/Xray-core/releases/latest/download/geosite.dat" \
     || true
 
-# Railway injects PORT at runtime; entrypoint rewrites the listen port accordingly
 ENV PORT=8080
 
 COPY config.json /etc/xray/config.json
+COPY nginx.conf /etc/nginx/nginx.conf
+COPY index.html /srv/dayanvpn/index.html
 COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+RUN mkdir -p /usr/share/nginx/html \
+    && chmod +x /entrypoint.sh
 
 EXPOSE 8080
 
