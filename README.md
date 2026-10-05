@@ -18,7 +18,7 @@ Client   ──▶  WS  /ray     ──▶  nginx  ──▶  Xray (VLESS)  ─�
 
 | File | Purpose |
 |------|---------|
-| `config.json` | Xray server config (VLESS + WS, path `/ray`) — **edit your UUID here** |
+| `config.json` | Xray server config (VLESS + WS, path `/ray`) — **the UUID lives here** |
 | `nginx.conf` | Routes `/` → landing page, `/ray` → Xray |
 | `index.html` | DayanVPN landing page (UUID auto-injected) |
 | `entrypoint.sh` | Injects UUID, aligns ports, starts both services |
@@ -26,10 +26,8 @@ Client   ──▶  WS  /ray     ──▶  nginx  ──▶  Xray (VLESS)  ─�
 
 ## Deploy to Railway
 
-1. **Generate your UUID** (this is the only credential you must change):
-   - PowerShell: `[guid]::NewGuid()` · macOS/Linux: `uuidgen`
-   - Replace `b7e3c4a1-9f2d-4e68-a1b5-3c9d8f0e2a47` in `config.json`.
-2. **Push to GitHub** — create a new (private) repo and upload all 5 files, or via git:
+1. Create a new **private** GitHub repo.
+2. Upload all 5 code files (`config.json`, `nginx.conf`, `index.html`, `entrypoint.sh`, `Dockerfile`) — or via git:
 
 ```powershell
 git init
@@ -56,13 +54,11 @@ vless://YOUR-UUID@your-domain.up.railway.app:443?encryption=none&security=tls&sn
 
 ## Troubleshooting
 
+- **404 on the domain** → the repo doesn't contain these files (old version deployed). Verify the build log shows `apk add ... nginx` and `COPY index.html`.
 - **Landing page loads but VPN doesn't connect** → UUID mismatch: the UUID shown at the bottom of the page is injected from `config.json` — it must match what your client uses (if you import from the page's link, it always will).
-- **Nothing loads at all** → check Railway build/deploy logs; `entrypoint.sh` or the Xray download likely failed.
-- **Works on WiFi but not mobile data / vice versa** → normal, carrier-level blocks vary; the domain itself is standard HTTPS, so try again later or generate a new Railway domain.
 - **QR doesn't appear** → the page loads a QR library from cdnjs; if blocked on your network, use the Copy button instead.
 
 ## Security notes
 
 - Keep the repo **private** — `config.json` contains your UUID, which is effectively the password to your server.
 - Anyone you share the page URL with can get the config — treat the domain as a secret.
-- The landing page only reveals UUID/domain to whoever opens it.

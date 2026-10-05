@@ -1,7 +1,7 @@
 # DayanVPN — Xray (VLESS + WebSocket) behind nginx, with a landing page
 FROM alpine:3.20
 
-RUN apk add --no-cache nginx curl unzip ca-certificates bash
+RUN apk add --no-cache nginx curl unzip ca-certificates
 
 # Install latest Xray-core
 RUN mkdir -p /usr/local/bin/xray /usr/local/share/xray \
@@ -9,11 +9,6 @@ RUN mkdir -p /usr/local/bin/xray /usr/local/share/xray \
     && unzip -o /tmp/Xray-linux-64.zip -d /usr/local/bin/xray \
     && chmod +x /usr/local/bin/xray/xray \
     && rm /tmp/Xray-linux-64.zip
-
-# GeoIP data for routing rules
-RUN curl -fsSL -o /usr/local/share/xray/geoip.dat "https://github.com/XTLS/Xray-core/releases/latest/download/geoip.dat" \
-    && curl -fsSL -o /usr/local/share/xray/geosite.dat "https://github.com/XTLS/Xray-core/releases/latest/download/geosite.dat" \
-    || true
 
 ENV PORT=8080
 
