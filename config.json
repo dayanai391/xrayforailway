@@ -1,0 +1,51 @@
+{
+  "log": {
+    "loglevel": "warning"
+  },
+  "inbounds": [
+    {
+      "listen": "0.0.0.0",
+      "port": 8080,
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "b7e3c4a1-9f2d-4e68-a1b5-3c9d8f0e2a47",
+            "flow": ""
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "ws",
+        "wsSettings": {
+          "path": "/ray"
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": ["http", "tls", "quic"]
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "freedom",
+      "tag": "direct"
+    },
+    {
+      "protocol": "blackhole",
+      "tag": "blocked"
+    }
+  ],
+  "routing": {
+    "domainStrategy": "AsIs",
+    "rules": [
+      {
+        "type": "field",
+        "ip": ["geoip:private"],
+        "outboundTag": "blocked"
+      }
+    ]
+  }
+}
